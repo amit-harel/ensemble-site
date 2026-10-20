@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ensemble · Privacy policy</title>
+<meta name="description" content="How Ensemble, a personal agent hub, handles mail, WhatsApp, calendar and Google user data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap" rel="stylesheet">
+<style>
+/* The privacy policy in Ensemble's Light language: a quiet reading sheet over a faint sky. */
+:root {
+  color-scheme: light;
+  --ground: oklch(0.975 0.008 250);
+  --ink: oklch(0.22 0.03 262);
+  --ink-2: oklch(0.44 0.03 262);
+  --hair: oklch(0.5 0.02 262 / 0.14);
+  --sheet: oklch(1 0 0 / 0.9);
+  --edge: oklch(1 0 0 / 0.85);
+  --signal: oklch(0.55 0.2 262);
+  --font: "Assistant", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; margin: 0; }
+body { font: 400 1.0625rem/1.65 var(--font); color: var(--ink); background: var(--ground); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto 0; height: 26rem; z-index: -1;
+  background: radial-gradient(60% 70% at 85% 0%, oklch(0.9 0.06 250), transparent 70%), radial-gradient(50% 60% at 10% 10%, oklch(0.92 0.06 300), transparent 70%);
+  mask: linear-gradient(#000 40%, transparent); }
+a { color: var(--signal); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 4px; }
+.wrap { max-width: 46rem; margin: 0 auto; padding: 2rem max(1.25rem, env(safe-area-inset-left)) 4rem; }
+.back { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--ink); text-decoration: none; }
+.back svg { width: 1.4rem; height: 1.4rem; }
+h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); font-weight: 250; letter-spacing: -0.03em; line-height: 1.05; margin-top: 3rem; }
+.meta { color: var(--ink-2); margin-top: 0.75rem; font-size: 0.95rem; }
+.sheet { margin-top: 2.5rem; background: var(--sheet); border-radius: 1.75rem; padding: clamp(1.25rem, 4vw, 2.75rem);
+  box-shadow: 0 1px 0 var(--edge) inset, 0 8px 30px oklch(0.4 0.08 262 / 0.08); }
+h2 { font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; margin-top: 2.25rem; }
+h2:first-child { margin-top: 0; }
+p, ul { margin-top: 0.75rem; max-width: 68ch; }
+ul { padding-inline-start: 1.25rem; }
+li + li { margin-top: 0.4rem; }
+.summary { font-size: 1.15rem; }
+table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.97rem; }
+th, td { text-align: start; vertical-align: top; padding: 0.7rem 0.75rem 0.7rem 0; border-bottom: 1px solid var(--hair); }
+th { font-weight: 600; color: var(--ink-2); font-size: 0.85rem; }
+td:first-child { font-weight: 600; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+code { font: 0.85em var(--mono); }
+/* on a phone each source is its own block, its columns labelled */
+@media (max-width: 40rem) {
+  table, tbody, tr, td { display: block; }
+  thead { display: none; }
+  tr { padding: 0.9rem 0; border-bottom: 1px solid var(--hair); }
+  td { border: 0; padding: 0.2rem 0; }
+  td:first-child { font-size: 1.05rem; }
+  td[data-l]::before { content: attr(data-l); display: block; margin-top: 0.4rem; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); }
+}
+.limited { margin-top: 1rem; padding: 1rem 1.2rem; border-radius: 1rem; background: oklch(0.55 0.2 262 / 0.07); }
+footer { margin-top: 2.5rem; color: var(--ink-2); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">
+    <svg viewBox="0 0 24 24" fill="none" stroke="oklch(0.58 0.17 255)" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 19L17 7"/><path d="M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/></svg>
+    Ensemble
+  </a>
+  <h1>Privacy policy</h1>
+  <p class="meta">Effective 20 October 2026 · Ensemble, a personal project by Amit Harel</p>
+
+  <div class="sheet">
+    <h2>In short</h2>
+    <p class="summary">Ensemble is software one person runs on his own Mac, for himself. It reads his mail, his WhatsApp messages and his calendar so it can tell him what needs him. It does not sell data, show ads, or share data with anyone except the services listed below, which it needs to work.</p>
+
+    <h2>Who uses it</h2>
+    <p>Ensemble is not offered to the public. Its only user is its owner. If anyone else ever signs in to it, everything in this policy applies to their data too.</p>
+
+    <h2>What it reads and why</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Source</th><th>What it reads</th><th>What it does with it</th></tr></thead>
+        <tbody>
+          <tr><td>Gmail</td><td data-l="What it reads">Messages, their senders, subjects and labels (Google scope <code>gmail.modify</code>)</td><td data-l="What it does with it">Sorts mail into labels, notices mail that needs a reply or holds a request, and turns requests into the owner's tasks. It does not send mail on its own.</td></tr>
+          <tr><td>Google Drive</td><td data-l="What it reads">Only files Ensemble itself creates (scope <code>drive.file</code>)</td><td data-l="What it does with it">Uploads a report of each sorting run (which mail went to which label) and a backup of the sorting database, to the owner's own Drive.</td></tr>
+          <tr><td>Google Calendar</td><td data-l="What it reads">The owner's events</td><td data-l="What it does with it">Shows the day's events, checks which shows he plays, and proposes changes — which happen only after he approves each one.</td></tr>
+          <tr><td>WhatsApp</td><td data-l="What it reads">Messages in the chats and groups the owner chooses to include</td><td data-l="What it does with it">Notices dates, changes and requests about his work, and tells him about them.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Where the data is kept</h2>
+    <p>On the owner's own Mac, in local files and a local database, with run reports and database backups in his own Google Drive. Access tokens and keys are kept in the Mac's Keychain. The owner can delete any of it at any time.</p>
+
+    <h2>Who else sees it</h2>
+    <p>To understand a message, Ensemble sometimes sends its text to an AI model. Before it does, it removes passwords, one-time codes, account and card numbers, and bank and health details; those never leave the Mac. The services involved are:</p>
+    <ul>
+      <li><strong>Anthropic</strong> (Claude) and <strong>OpenRouter</strong> (the classifier models it routes to) — to judge what a message asks, through their APIs, under their terms for API data.</li>
+      <li><strong>Composio</strong> — the connection Ensemble uses to reach Google Calendar.</li>
+      <li><strong>Telegram</strong> — carries Ensemble's messages to the owner's own chat.</li>
+      <li><strong>Google</strong> and <strong>WhatsApp</strong> — the sources themselves.</li>
+    </ul>
+    <p>Some of the work is done by a model that runs on the Mac itself; that text never leaves it.</p>
+
+    <h2>Google user data</h2>
+    <div class="limited">
+      <p style="margin-top:0">Ensemble's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. Google user data is used only to provide the features described above to the owner. It is not used for advertising, not sold, not used to train general AI models, and not read by people other than the owner.</p>
+    </div>
+
+    <h2>Keeping and deleting</h2>
+    <p>Data stays until the owner deletes it. Revoking Ensemble's access in the Google account settings (Security → Third-party apps) stops all further reading of Gmail and Drive at once.</p>
+
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, the date at the top changes with it. Questions: <a href="https://github.com/amit-harel">github.com/amit-harel</a>.</p>
+  </div>
+
+  <footer><a href="./">Back to Ensemble</a></footer>
+</div>
+</body>
+</html>

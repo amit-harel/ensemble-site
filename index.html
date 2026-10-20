@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ensemble</title>
+<meta name="description" content="Ensemble is a small band of AI agents that runs on a Mac at home and brings a working musician only what needs him.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&display=swap" rel="stylesheet">
+<style>
+/* "Morning light" — Ensemble's own Light language (D87): a sky behind the day, quiet
+   reading sheets, glass for what needs you, thin neon glyphs, Assistant light at display size.
+   density 3 · variance 5 · motion 6. Signature: a real Today card coming to life. */
+:root {
+  color-scheme: light;
+  --ground: oklch(0.975 0.008 250);
+  --ink: oklch(0.22 0.03 262);
+  --ink-2: oklch(0.44 0.03 262);
+  --hair: oklch(0.5 0.02 262 / 0.14);
+  --sheet: oklch(1 0 0 / 0.86);
+  --glass: oklch(1 0 0 / 0.6);
+  --edge: oklch(1 0 0 / 0.85);
+  --signal: oklch(0.55 0.2 262);
+  --warm: oklch(0.84 0.14 70);
+  --warm-ink: oklch(0.38 0.11 55);
+  --ok: oklch(0.6 0.15 160);
+  /* the sky: set by the hour of the visitor's day (script below); day is the fallback */
+  --sky-a: oklch(0.9 0.06 250);
+  --sky-b: oklch(0.92 0.06 300);
+  --sky-c: oklch(0.93 0.07 170);
+  --lift: 0 1px 0 var(--edge) inset, 0 18px 50px oklch(0.4 0.08 262 / 0.16);
+  --rest: 0 1px 0 var(--edge) inset, 0 6px 22px oklch(0.4 0.08 262 / 0.08);
+  --font: "Assistant", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --t-body: 1.125rem; --t-small: 0.9375rem; --t-cap: 0.8125rem;
+  --t-h2: clamp(2rem, 4.2vw, 3.25rem);
+  --t-hero: clamp(3.4rem, 8.6vw, 7rem);
+  --s-item: 0.5rem; --s-group: 1rem; --s-block: 2rem; --s-section: clamp(5rem, 12vw, 9rem);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  /* the neon tints, one per part, as in the app */
+  --violet: oklch(0.6 0.17 290); --blue: oklch(0.62 0.14 220); --indigo: oklch(0.58 0.17 255);
+  --teal: oklch(0.62 0.13 190); --green: oklch(0.66 0.16 160); --amber: oklch(0.7 0.15 60);
+  --rose: oklch(0.6 0.16 340);
+}
+* { box-sizing: border-box; margin: 0; }
+html { scroll-behavior: smooth; }
+body { font: 400 var(--t-body)/1.6 var(--font); color: var(--ink); background: var(--ground); -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 72rem; margin: 0 auto; padding-inline: max(1.25rem, env(safe-area-inset-left)); }
+.he { direction: rtl; unicode-bidi: isolate; font-family: var(--font); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+
+/* ── the sky ─────────────────────────────────────────────────────────── */
+.sky { position: absolute; inset: 0 0 auto 0; height: min(100vh, 58rem); z-index: -1; overflow: hidden;
+  background:
+    radial-gradient(70% 60% at 82% 8%, var(--sky-a), transparent 70%),
+    radial-gradient(60% 55% at 12% 22%, var(--sky-b), transparent 70%),
+    radial-gradient(80% 50% at 55% 78%, var(--sky-c), transparent 72%);
+  mask: linear-gradient(#000 62%, transparent); transition: background 1.2s var(--ease); }
+.sky::after { content: ""; position: absolute; inset: -20%;
+  background: radial-gradient(30% 30% at 70% 30%, oklch(1 0 0 / 0.55), transparent 70%);
+  animation: drift 22s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: translate(-8%, 6%) scale(1.1); } }
+
+/* ── top line ────────────────────────────────────────────────────────── */
+.top { display: flex; align-items: center; justify-content: space-between; padding-block: 1.5rem; gap: 1rem; }
+.mark { display: inline-flex; align-items: center; gap: 0.6rem; font-weight: 600; font-size: 1.15rem; letter-spacing: -0.01em; text-decoration: none; }
+.mark svg { width: 1.6rem; height: 1.6rem; }
+.top nav { display: flex; gap: 1.5rem; font-size: var(--t-small); }
+.top nav a { text-decoration: none; color: var(--ink-2); }
+.top nav a:hover { color: var(--ink); }
+.clock { font-size: var(--t-cap); color: var(--ink-2); }
+
+/* ── hero ────────────────────────────────────────────────────────────── */
+.hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--s-block); align-items: center; padding-block: clamp(2rem, 6vw, 5rem) var(--s-section); }
+.hero h1 { font-size: var(--t-hero); font-weight: 250; line-height: 0.98; letter-spacing: -0.035em; text-wrap: balance; }
+.hero h1 b { font-weight: 600; }
+.hero .he-line { font-size: clamp(1.4rem, 2.6vw, 2rem); font-weight: 300; color: var(--ink-2); margin-top: var(--s-group); }
+.hero p.lede { max-width: 34rem; margin-top: var(--s-block); color: var(--ink-2); font-size: 1.2rem; }
+.hero .by { margin-top: var(--s-group); font-size: var(--t-small); color: var(--ink-2); }
+
+/* the phone: Today, as the app draws it, with one card coming to life */
+.phone { justify-self: center; width: min(22rem, 100%); aspect-ratio: 9 / 18.5; border-radius: 2.6rem; padding: 0.6rem;
+  background: oklch(0.2 0.02 262); box-shadow: 0 40px 80px oklch(0.3 0.06 262 / 0.28), 0 0 0 1px oklch(1 0 0 / 0.08) inset; }
+.screen { position: relative; height: 100%; border-radius: 2.1rem; overflow: hidden; background: var(--ground); isolation: isolate;
+  direction: rtl; padding: 3.2rem 1rem 1rem; font-size: 0.82rem; }
+.screen .sky-in { position: absolute; inset: 0 0 auto 0; height: 55%; z-index: -1;
+  background: radial-gradient(80% 60% at 80% 0%, var(--warm), transparent 70%), radial-gradient(60% 60% at 10% 30%, var(--sky-b), transparent 70%);
+  mask: linear-gradient(#000 50%, transparent); }
+.screen .day { font-size: 0.7rem; color: var(--ink-2); }
+.screen h3 { font-size: 1.55rem; font-weight: 300; line-height: 1.1; margin: 0.15rem 0 0.9rem; letter-spacing: -0.02em; }
+.screen h3 b { font-weight: 600; }
+.screen h3 span { grid-area: 1 / 1; }
+.screen h3 { display: grid; }
+.h-one { opacity: 0; }
+.toast { position: absolute; inset-inline: 0.7rem; top: 0.7rem; padding: 0.55rem 0.7rem; border-radius: 1rem; background: var(--glass);
+  backdrop-filter: blur(20px) saturate(160%); box-shadow: var(--lift); font-size: 0.72rem; display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.5rem; align-items: center;
+  transform: translateY(-140%); }
+.toast i { grid-row: span 2; width: 1.6rem; height: 1.6rem; border-radius: 0.5rem; display: grid; place-items: center; background: oklch(0.6 0.15 150); color: white; font-style: normal; }
+.toast b { font-weight: 600; }
+.toast span { color: var(--ink-2); }
+.card { border-radius: 1.2rem; padding: 0 0.85rem; background: var(--glass); backdrop-filter: blur(20px) saturate(160%); box-shadow: var(--lift);
+  opacity: 0; max-height: 0; overflow: hidden; transform: translateY(10px) scale(0.97); filter: blur(6px); }
+.card .k { font-size: 0.66rem; color: var(--warm-ink); font-weight: 600; letter-spacing: 0.02em; }
+.card h4 { font-size: 0.95rem; font-weight: 600; margin: 0.2rem 0 0.35rem; line-height: 1.3; }
+.card .step { font-size: 0.72rem; color: var(--ink-2); line-height: 1.45; }
+.card .step .mono { color: var(--ink); }
+.card .acts { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+.card .btn { border-radius: 999px; padding: 0.35rem 0.8rem; font-size: 0.72rem; font-weight: 600; background: oklch(0.4 0.08 262 / 0.08); }
+.card .btn.go { background: var(--signal); color: white; position: relative; overflow: hidden; }
+.card .btn.go::after { content: ""; position: absolute; inset: 0; background: white; opacity: 0; border-radius: inherit; }
+.feed { margin-top: 0.9rem; border-radius: 1rem; background: var(--sheet); box-shadow: var(--rest); padding: 0 0.8rem; }
+.feed h5 { font-size: 0.64rem; color: var(--ink-2); font-weight: 600; padding-top: 0.6rem; }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 0 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--hair); }
+.line:last-child { border: 0; }
+.line .src { font-size: 0.62rem; color: var(--ink-2); }
+.line .t { font-size: 0.6rem; color: var(--ink-2); }
+.line .say { grid-column: 1 / -1; font-size: 0.76rem; font-weight: 500; }
+.line.receipt { opacity: 0; max-height: 0; padding-block: 0; overflow: hidden; }
+.line.receipt .say { color: var(--ok); }
+.todo { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--hair); font-size: 0.76rem; }
+.todo:last-child { border: 0; }
+.todo i { flex: none; width: 0.85rem; height: 0.85rem; border-radius: 50%; border: 1.5px solid oklch(0.5 0.03 262 / 0.45); }
+.todo small { margin-inline-start: auto; font-size: 0.6rem; color: var(--ink-2); }
+
+/* the sequence: a message lands, the card makes room and forms, his tap, the card leaves and a receipt stays — 10s, looped */
+.alive .h-one { animation: h-one 10s var(--ease) infinite; }
+.alive .h-none { animation: h-none 10s var(--ease) infinite; }
+.alive .toast { animation: toast 10s var(--ease) infinite; }
+.alive .card { animation: card 10s var(--ease) infinite; }
+.alive .card .btn.go::after { animation: press 10s ease infinite; }
+.alive .line.receipt { animation: receipt 10s var(--ease) infinite; }
+@keyframes toast { 0%, 4% { transform: translateY(-140%); } 9%, 26% { transform: none; } 31%, 100% { transform: translateY(-140%); } }
+@keyframes card { 0%, 18% { opacity: 0; max-height: 0; padding-block: 0; transform: translateY(10px) scale(0.97); filter: blur(6px); }
+  23% { opacity: 0; max-height: 12rem; padding-block: 0.8rem; transform: translateY(10px) scale(0.97); filter: blur(6px); }
+  30%, 62% { opacity: 1; max-height: 12rem; padding-block: 0.8rem; transform: none; filter: none; }
+  67% { opacity: 0; max-height: 12rem; padding-block: 0.8rem; transform: translateY(-8px) scale(0.98); filter: blur(4px); }
+  73%, 100% { opacity: 0; max-height: 0; padding-block: 0; transform: translateY(-8px) scale(0.98); filter: blur(4px); } }
+@keyframes h-one { 0%, 23% { opacity: 0; } 26%, 63% { opacity: 1; } 66%, 100% { opacity: 0; } }
+@keyframes h-none { 0%, 20% { opacity: 1; } 23%, 66% { opacity: 0; } 69%, 100% { opacity: 1; } }
+@keyframes press { 0%, 52% { opacity: 0; } 55% { opacity: 0.45; } 60%, 100% { opacity: 0; } }
+@keyframes receipt { 0%, 64% { opacity: 0; max-height: 0; padding-block: 0; } 70%, 94% { opacity: 1; max-height: 4rem; padding-block: 0.5rem; } 100% { opacity: 0; max-height: 0; padding-block: 0; } }
+
+/* ── sections ────────────────────────────────────────────────────────── */
+section { padding-block: 0 var(--s-section); }
+.eyebrowless h2, section h2 { font-size: var(--t-h2); font-weight: 300; letter-spacing: -0.025em; line-height: 1.05; max-width: 22ch; text-wrap: balance; }
+section .intro { max-width: 40rem; color: var(--ink-2); margin-top: var(--s-group); }
+
+/* the flow, drawn: where work happens → Ensemble → you */
+.flow { margin-top: var(--s-block); background: var(--sheet); border-radius: 2rem; box-shadow: var(--rest); padding: clamp(1rem, 3vw, 2.5rem); overflow-x: auto; }
+.flow svg { display: block; width: 100%; min-width: 40rem; height: auto; }
+.flow .wire { fill: none; stroke: oklch(0.55 0.1 262 / 0.35); stroke-width: 1.5; stroke-dasharray: 600; stroke-dashoffset: 600; transition: stroke-dashoffset 1.6s var(--ease); }
+.flow.drawn .wire { stroke-dashoffset: 0; }
+.flow .wire.w2 { transition-delay: 0.15s; } .flow .wire.w3 { transition-delay: 0.3s; }
+.flow .wire.o1 { transition-delay: 0.9s; } .flow .wire.o2 { transition-delay: 1.05s; }
+.flow .glyph { fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.flow text { font-family: var(--font); fill: var(--ink); }
+.flow .lbl { font-size: 15px; font-weight: 600; } .flow .sub { font-size: 12.5px; fill: var(--ink-2); }
+.flow .pulse { opacity: 0; } .flow.drawn .pulse { animation: travel 4.5s linear infinite; opacity: 1; }
+@keyframes travel { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+
+/* three promises, laid out as unequal columns (what matters most is widest) */
+.rules { margin-top: var(--s-block); display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: var(--s-group); }
+.rule { padding: 1.6rem; border-radius: 1.6rem; background: var(--sheet); box-shadow: var(--rest); }
+.rule.lead { background: linear-gradient(160deg, oklch(0.96 0.05 70 / 0.9), var(--sheet) 60%); }
+.rule h3 { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.01em; margin-top: 0.8rem; line-height: 1.2; }
+.rule p { color: var(--ink-2); margin-top: var(--s-item); font-size: 1.02rem; }
+.rule svg { width: 2.2rem; height: 2.2rem; }
+
+.home { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-block); align-items: end; }
+.home p { color: var(--ink-2); max-width: 36rem; }
+.home p + p { margin-top: var(--s-group); }
+.tiers { list-style: none; padding: 0; display: grid; gap: var(--s-item); }
+.tiers li { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; padding: 0.9rem 1.1rem; border-radius: 1rem; background: var(--sheet); box-shadow: var(--rest); font-size: 1rem; }
+.tiers b { font-weight: 600; }
+.tiers span { color: var(--ink-2); }
+
+footer { border-top: 1px solid var(--hair); padding-block: 2rem 3rem; display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; color: var(--ink-2); font-size: var(--t-small); }
+footer a { text-decoration-color: var(--hair); text-underline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .hero, .home { grid-template-columns: 1fr; }
+  .rules { grid-template-columns: 1fr; }
+  .phone { width: min(19rem, 100%); }
+  .top nav { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky::after { animation: none; }
+  .alive .toast, .alive .card, .alive .card .btn.go::after, .alive .line.receipt, .alive .h-one, .alive .h-none { animation: none; }
+  .card { opacity: 1; max-height: none; padding-block: 0.8rem; transform: none; filter: none; }
+  .h-one { opacity: 1; } .h-none { opacity: 0; }
+  .line.receipt { opacity: 1; max-height: none; padding-block: 0.5rem; }
+  .flow .wire { transition: none; stroke-dashoffset: 0; }
+  .flow.drawn .pulse { animation: none; opacity: 0; }
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top">
+    <a class="mark" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 19L17 7"/><path d="M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/></svg>
+      Ensemble
+    </a>
+    <nav aria-label="Sections"><a href="#how">How it works</a><a href="#rules">What it will not do</a><a href="#home">Your data</a><a href="privacy.html">Privacy</a></nav>
+    <span class="clock mono" id="clock" aria-hidden="true"></span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Only what <b>needs you</b>, in one quiet place.</h1>
+        <p class="he-line he" lang="he">רק מה שצריך אותך, במקום אחד שקט.</p>
+        <p class="lede">Ensemble is a small band of AI agents that runs on a Mac at home. It reads the mail, the WhatsApp groups and the calendar of a working musician, and brings him only what needs him — a show that moved, a request to answer, a date to confirm.</p>
+        <p class="by">Built by Amit Harel, a keyboard player and producer, for his own working life.</p>
+      </div>
+      <div class="phone" aria-label="Ensemble's Today screen: a WhatsApp message about tomorrow's balance becomes a card to move the show in the calendar, approved with one tap">
+        <div class="screen alive" id="screen">
+          <div class="sky-in" aria-hidden="true"></div>
+          <div class="toast" aria-hidden="true"><i>✆</i><b>הלהקה · תיאומים</b><span>נועה: מחר הגעה לבאלנס 17:45</span></div>
+          <div class="day">יום שלישי · 20 באוקטובר</div>
+          <h3><span class="h-one">דבר אחד <b>צריך אותך.</b></span><span class="h-none" aria-hidden="true">הכול <b>שקט.</b></span></h3>
+          <div class="card" aria-hidden="true">
+            <div class="k">יומן · וואטסאפ</div>
+            <h4>להזיז את „הופעה בחיפה” ל-17:45</h4>
+            <div class="step">Google ראשי · <span class="mono">21.10 17:00 → 17:45</span><br>נועה: “מחר הגעה לבאלנס 17:45”</div>
+            <div class="acts"><span class="btn go">עדכן ביומן</span><span class="btn">דחה</span></div>
+          </div>
+          <div class="feed" aria-hidden="true">
+            <h5>מה קרה היום</h5>
+            <div class="line receipt"><span class="src">יומן</span><span class="t mono">13:46</span><span class="say">✓ „הופעה בחיפה” מתחילה ב-17:45</span></div>
+            <div class="line"><span class="src">דואר דחוף</span><span class="t mono">12:19</span><span class="say">רוני — הצעת מחיר לחתונה</span></div>
+            <div class="line"><span class="src">התדריך</span><span class="t mono">07:30</span><span class="say">3 אירועים היום, 3 משימות</span></div>
+          </div>
+          <div class="feed" aria-hidden="true">
+            <h5>משימות</h5>
+            <div class="todo"><i></i>להשיב לרוני ולשלוח חשבונית<small>מאתמול</small></div>
+            <div class="todo"><i></i>לאשר את 3.11 בהרצליה<small>וואטסאפ</small></div>
+            <div class="todo"><i></i>לשלוח את הסקיצות לאולפן<small>דואר</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section id="how" aria-labelledby="how-h">
+      <h2 id="how-h">It listens where the work already happens.</h2>
+      <p class="intro">Nobody has to move into a new app. Each source has one part that reads it and knows its rules; what concerns him reaches one screen and one chat.</p>
+      <div class="flow" id="flow">
+        <svg viewBox="0 0 960 360" role="img" aria-label="Mail, WhatsApp groups and the calendar each have a part that reads them; Ensemble brings what needs him to the Today screen and to Telegram.">
+          <defs><path id="p1" d="M210 70 C 360 70, 380 180, 470 180"/><path id="p2" d="M210 180 L 470 180"/><path id="p3" d="M210 290 C 360 290, 380 180, 470 180"/><path id="q1" d="M560 180 C 640 180, 660 100, 760 100"/><path id="q2" d="M560 180 C 640 180, 660 260, 760 260"/></defs>
+          <use href="#p1" class="wire w1"/><use href="#p2" class="wire w2"/><use href="#p3" class="wire w3"/><use href="#q1" class="wire o1"/><use href="#q2" class="wire o2"/>
+          <circle r="4" fill="var(--rose)" class="pulse" style="offset-path: path('M210 70 C 360 70, 380 180, 470 180 C 640 180, 660 100, 760 100')"/>
+          <circle r="4" fill="var(--teal)" class="pulse" style="offset-path: path('M210 180 L 470 180 C 640 180, 660 260, 760 260'); animation-delay: -1.5s"/>
+          <circle r="4" fill="var(--blue)" class="pulse" style="offset-path: path('M210 290 C 360 290, 380 180, 470 180 C 640 180, 660 100, 760 100'); animation-delay: -3s"/>
+          <g transform="translate(150 46)"><g class="glyph" stroke="var(--rose)"><rect x="3" y="6" width="18" height="12" rx="3" transform="scale(2)"/><path d="M3 8l9 6 9-6" transform="scale(2)"/></g></g>
+          <text x="40" y="66" class="lbl">Mail</text><text x="40" y="86" class="sub">sorted as it lands</text>
+          <g transform="translate(150 156)"><g class="glyph" stroke="var(--teal)" transform="scale(2)"><path d="M12 3a9 9 0 0 0-7.6 13.8L3 21l4.4-1.3A9 9 0 1 0 12 3z"/></g></g>
+          <text x="40" y="176" class="lbl">WhatsApp</text><text x="40" y="196" class="sub">your work groups</text>
+          <g transform="translate(150 266)"><g class="glyph" stroke="var(--blue)" transform="scale(2)"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></g></g>
+          <text x="40" y="286" class="lbl">Calendar</text><text x="40" y="306" class="sub">the truth about dates</text>
+          <circle cx="515" cy="180" r="44" fill="var(--sheet)" stroke="oklch(0.55 0.15 262 / 0.35)"/>
+          <g transform="translate(491 156)"><g class="glyph" stroke="var(--indigo)" transform="scale(2)"><path d="M5 19L17 7"/><path d="M17 3l1 3 3 1-3 1-1 3-1-3-3-1 3-1z"/></g></g>
+          <text x="515" y="250" text-anchor="middle" class="lbl">Ensemble</text><text x="515" y="270" text-anchor="middle" class="sub">on a Mac at home</text>
+          <g transform="translate(772 76)"><g class="glyph" stroke="var(--amber)" transform="scale(2)"><circle cx="12" cy="13" r="4"/><path d="M12 4v2M4.5 9l1.5 1M19.5 9l-1.5 1M3 17h18"/></g></g>
+          <text x="830" y="96" class="lbl">Today</text><text x="830" y="116" class="sub">one screen</text>
+          <g transform="translate(772 236)"><g class="glyph" stroke="var(--violet)" transform="scale(2)"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4V6Z"/></g></g>
+          <text x="830" y="256" class="lbl">Telegram</text><text x="830" y="276" class="sub">one chat</text>
+        </svg>
+      </div>
+    </section>
+
+    <section id="rules" aria-labelledby="rules-h">
+      <h2 id="rules-h">What it will not do.</h2>
+      <div class="rules">
+        <article class="rule lead">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 12.5l3 3 5.5-6"/></svg>
+          <h3>Change anything without your tap.</h3>
+          <p>A moved show, a new date, a message to send: each one is a card that says exactly what will happen. Approve it, and the receipt stays.</p>
+        </article>
+        <article class="rule">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--rose)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+          <h3>Ring you for small talk.</h3>
+          <p>A show someone else covers, a summary, a chat between friends: it stays quiet.</p>
+        </article>
+        <article class="rule">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a4 4 0 0 1 4 4V20H9a4 4 0 0 1-4-4Z"/><path d="M5 16a4 4 0 0 1 4-4h9"/></svg>
+          <h3>Forget what you told it.</h3>
+          <p>Every “not needed” and every correction is kept, so it learns what matters to you.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="home" aria-labelledby="home-h" class="home">
+      <div>
+        <h2 id="home-h">It stays home.</h2>
+        <p class="intro">Ensemble runs on one Mac, for one person. Mail is sorted there and the records stay there. Only the words a model must read to judge a message leave it, and some things never do.</p>
+        <p><a href="privacy.html">Read the privacy policy</a></p>
+      </div>
+      <ul class="tiers">
+        <li><b>Never leaves</b><span>passwords, codes, account and card numbers, bank and health details</span></li>
+        <li><b>Masked</b><span>mail, WhatsApp and calendar text read by a model, with the above removed</span></li>
+        <li><b>Free</b><span>public pages it reads for you</span></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <span>Ensemble · a personal project by Amit Harel</span>
+    <span><a href="privacy.html">Privacy policy</a> · <a href="https://github.com/amit-harel">GitHub</a></span>
+  </footer>
+</div>
+
+<script>
+/* The sky follows the visitor's hour, as Today's sky follows the day. */
+(function () {
+  const h = new Date().getHours();
+  const skies = {
+    dawn:  ["oklch(0.9 0.07 30)",  "oklch(0.92 0.05 330)", "oklch(0.94 0.05 80)"],
+    day:   ["oklch(0.9 0.06 250)", "oklch(0.92 0.06 300)", "oklch(0.93 0.07 170)"],
+    dusk:  ["oklch(0.88 0.09 60)", "oklch(0.88 0.08 320)", "oklch(0.9 0.06 270)"],
+    night: ["oklch(0.86 0.07 270)","oklch(0.88 0.06 300)", "oklch(0.9 0.05 230)"],
+  };
+  const part = h >= 5 && h < 9 ? "dawn" : h < 17 && h >= 9 ? "day" : h >= 17 && h < 20 ? "dusk" : "night";
+  const [a, b, c] = skies[part];
+  const root = document.documentElement.style;
+  root.setProperty("--sky-a", a); root.setProperty("--sky-b", b); root.setProperty("--sky-c", c);
+  const clock = document.getElementById("clock");
+  const tick = () => { const d = new Date(); clock.textContent = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) + " · " + part; };
+  tick(); setInterval(tick, 30000);
+  /* the flow draws itself when it comes into view */
+  const flow = document.getElementById("flow");
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((es, o) => es.forEach((e) => { if (e.isIntersecting) { flow.classList.add("drawn"); o.disconnect(); } }), { threshold: 0.35 }).observe(flow);
+  } else flow.classList.add("drawn");
+})();
+</script>
+</body>
+</html>
