@@ -68,7 +68,7 @@ footer { margin-top: 2.5rem; color: var(--ink-2); font-size: 0.9rem; }
     Ensemble
   </a>
   <h1>Privacy policy</h1>
-  <p class="meta">Effective 20 October 2026 · Ensemble, a personal project by Amit Harel</p>
+  <p class="meta">Effective 27 October 2026 · Ensemble, a personal project by Amit Harel</p>
 
   <div class="sheet">
     <h2>In short</h2>
@@ -82,7 +82,7 @@ footer { margin-top: 2.5rem; color: var(--ink-2); font-size: 0.9rem; }
       <table>
         <thead><tr><th>Source</th><th>What it reads</th><th>What it does with it</th></tr></thead>
         <tbody>
-          <tr><td>Gmail</td><td data-l="What it reads">Messages, their senders, subjects and labels (Google scope <code>gmail.modify</code>)</td><td data-l="What it does with it">Sorts mail into labels, notices mail that needs a reply or holds a request, and turns requests into the owner's tasks. It does not send mail on its own.</td></tr>
+          <tr><td>Gmail</td><td data-l="What it reads">Messages, their senders, subjects and labels (Google scope <code>gmail.modify</code>)</td><td data-l="What it does with it">Sorts mail into labels, notices mail that needs a reply or holds a request, turns requests into the owner's tasks, and searches and reads the mailbox when the owner asks. It sends, replies to, forwards or relabels mail only when the owner approves each one, and it never deletes mail.</td></tr>
           <tr><td>Google Drive</td><td data-l="What it reads">Only files Ensemble itself creates (scope <code>drive.file</code>)</td><td data-l="What it does with it">Uploads a report of each sorting run (which mail went to which label) and a backup of the sorting database, to the owner's own Drive.</td></tr>
           <tr><td>Google Calendar</td><td data-l="What it reads">The owner's events</td><td data-l="What it does with it">Shows the day's events, checks which shows he plays, and proposes changes — which happen only after he approves each one.</td></tr>
           <tr><td>WhatsApp</td><td data-l="What it reads">Messages in the chats and groups the owner chooses to include</td><td data-l="What it does with it">Notices dates, changes and requests about his work, and tells him about them.</td></tr>
@@ -94,10 +94,10 @@ footer { margin-top: 2.5rem; color: var(--ink-2); font-size: 0.9rem; }
     <p>On the owner's own Mac, in local files and a local database, with run reports and database backups in his own Google Drive. Access tokens and keys are kept in the Mac's Keychain. The owner can delete any of it at any time.</p>
 
     <h2>Who else sees it</h2>
-    <p>To understand a message, Ensemble sometimes sends its text to an AI model. Before it does, it removes passwords, one-time codes, account and card numbers, and bank and health details; those never leave the Mac. The services involved are:</p>
+    <p>To understand a message, Ensemble sometimes sends its text to an AI model. Passwords, one-time codes, keys and tokens are always removed first and never leave the Mac. In mail it reads on its own, it also removes long numbers (card, account, ID and phone numbers). Mail the owner asks for himself — a search, a mail he wants read — is sent as it is, apart from passwords, codes, keys and tokens. Mail text can contain anything its senders wrote, health details included. The services involved are:</p>
     <ul>
       <li><strong>Anthropic</strong> (Claude) and <strong>OpenRouter</strong> (the classifier models it routes to) — to judge what a message asks, through their APIs, under their terms for API data.</li>
-      <li><strong>Composio</strong> — the connection Ensemble uses to reach Google Calendar.</li>
+      <li><strong>Composio</strong> — the connection Ensemble uses to reach Gmail (searching and reading mail, and sending only with the owner's approval) and Google Calendar. Composio holds its own sign-in to the owner's Google account.</li>
       <li><strong>Telegram</strong> — carries Ensemble's messages to the owner's own chat.</li>
       <li><strong>Google</strong> and <strong>WhatsApp</strong> — the sources themselves.</li>
     </ul>
