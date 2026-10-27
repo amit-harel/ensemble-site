@@ -1,6 +1,9 @@
 # Changelog
 
 ## 2026-10-27
+- Home page: where the data stays now matches the privacy policy (never leaves: passwords, one-time
+  codes, keys and tokens; masked: text a model reads on its own, long numbers removed too; mail the
+  owner asks for goes as it is).
 - Privacy policy: Gmail is also searched and read when the owner asks, and mail is sent, replied to,
   forwarded or relabelled only with his approval of each one, never deleted; Composio also reaches
   Gmail; what is masked before a model reads mail, as it is now (mail the owner asks for goes as it
